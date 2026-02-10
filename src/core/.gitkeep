@@ -1,0 +1,6 @@
+// This directory will contain core logic (the "brain")
+// - entropy.ts: Shannon Entropy calculation
+// - complexity.ts: Pattern detection
+// - crackTime.ts: Time-to-crack simulation
+// - constants.ts: GPU hash rates and lookup tables
+// - zxcvbnWrapper.ts: zxcvbn library integration

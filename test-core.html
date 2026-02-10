@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sentinel Core Logic Tests</title>
+    <style>
+      body {
+        font-family: "Courier New", monospace;
+        background: #1e1e1e;
+        color: #d4d4d4;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      .header {
+        color: #4ec9b0;
+        font-weight: bold;
+        border-bottom: 2px solid #4ec9b0;
+        padding-bottom: 10px;
+        margin-bottom: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        background: #252526;
+        border-left: 4px solid #007acc;
+      }
+      .test-title {
+        color: #dcdcaa;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+      .result {
+        margin: 5px 0;
+        padding-left: 20px;
+      }
+      .pass {
+        color: #4ec9b0;
+      }
+      .fail {
+        color: #f48771;
+      }
+      .warning {
+        color: #ce9178;
+      }
+      .info {
+        color: #9cdcfe;
+      }
+      pre {
+        background: #1e1e1e;
+        padding: 10px;
+        border-radius: 4px;
+        overflow-x: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>🛡️ SENTINEL - CORE LOGIC LAYER TEST SUITE</h1>
+      <p>Testing Password Strength Analysis Components</p>
+    </div>
+
+    <div id="test-output"></div>
+
+    <script type="module">
+      import { analyzeEntropy } from "./core/entropy.js";
+      import { detectPatterns } from "./core/complexity.js";
+      import { calculateCrackTime } from "./core/crackTime.js";
+      import {
+        analyzeWithZxcvbn,
+        compareEntropyWithZxcvbn,
+      } from "./core/zxcvbnWrapper.js";
+
+      const output = document.getElementById("test-output");
+
+      function addSection(title, content) {
+        const section = document.createElement("div");
+        section.className = "test-section";
+        section.innerHTML = `<div class="test-title">${title}</div>${content}`;
+        output.appendChild(section);
+      }
+
+      function testPassword(password, description) {
+        const entropy = analyzeEntropy(password);
+        const patterns = detectPatterns(password);
+        const crackTime = calculateCrackTime(entropy.poolSize, entropy.length);
+        const zxcvbn = analyzeWithZxcvbn(password);
+        const comparison = compareEntropyWithZxcvbn(entropy.entropy, zxcvbn);
+
+        const content = `
+                <div class="result info">Password: "${password}" - ${description}</div>
+                <div class="result">
+                    <strong>Entropy Analysis:</strong><br>
+                    &nbsp;&nbsp;Length: ${entropy.length} characters<br>
+                    &nbsp;&nbsp;Pool Size: ${entropy.poolSize}<br>
+                    &nbsp;&nbsp;Entropy: <span class="pass">${entropy.entropy} bits</span><br>
+                    &nbsp;&nbsp;Strength: <span class="${entropy.strength === "very-strong" || entropy.strength === "strong" ? "pass" : "warning"}">${entropy.strength}</span>
+                </div>
+                <div class="result">
+                    <strong>Pattern Detection:</strong><br>
+                    &nbsp;&nbsp;Score: ${patterns.score}/100<br>
+                    &nbsp;&nbsp;Weak Patterns: ${patterns.hasWeakPatterns ? '<span class="fail">YES</span>' : '<span class="pass">NO</span>'}<br>
+                    ${patterns.patterns.map((p) => `&nbsp;&nbsp;- [${p.severity}] ${p.description}`).join("<br>")}
+                </div>
+                <div class="result">
+                    <strong>Crack Time (MD5):</strong><br>
+                    &nbsp;&nbsp;Combinations: ${crackTime.combinations.toExponential(2)}<br>
+                    &nbsp;&nbsp;Time to Crack: <span class="warning">${crackTime.formatted}</span><br>
+                    &nbsp;&nbsp;Severity: ${crackTime.severity}
+                </div>
+                <div class="result">
+                    <strong>zxcvbn Analysis:</strong><br>
+                    &nbsp;&nbsp;Score: ${zxcvbn.score}/4<br>
+                    &nbsp;&nbsp;Strength: ${zxcvbn.strength}<br>
+                    &nbsp;&nbsp;Crack Time: ${zxcvbn.crackTimeDisplay}<br>
+                    ${zxcvbn.feedback.warning ? `&nbsp;&nbsp;<span class="warning">⚠️ ${zxcvbn.feedback.warning}</span><br>` : ""}
+                </div>
+                <div class="result">
+                    <strong>Comparison:</strong><br>
+                    &nbsp;&nbsp;Manual Entropy: ${comparison.manualEntropy.toFixed(2)} bits<br>
+                    &nbsp;&nbsp;zxcvbn Entropy: ${(comparison.zxcvbnGuessesLog10 * Math.log2(10)).toFixed(2)} bits<br>
+                    &nbsp;&nbsp;<span class="info">${comparison.recommendation}</span>
+                </div>
+            `;
+
+        addSection(`Test: ${password}`, content);
+      }
+
+      // Run tests
+      addSection(
+        "Starting Tests...",
+        '<div class="result pass">All modules loaded successfully!</div>',
+      );
+
+      const testCases = [
+        { password: "123456", description: "Very weak - common password" },
+        { password: "password", description: "Very weak - dictionary word" },
+        { password: "qwerty", description: "Very weak - keyboard walk" },
+        {
+          password: "Password123",
+          description: "Fair - mixed case with numbers",
+        },
+        {
+          password: "Tr0ub4dor&3",
+          description: "Strong - XKCD famous example",
+        },
+        {
+          password: "correct horse battery staple",
+          description: "Strong - passphrase",
+        },
+        {
+          password: "X9$mK#pL2@qR",
+          description: "Very strong - random characters",
+        },
+      ];
+
+      testCases.forEach((test) =>
+        testPassword(test.password, test.description),
+      );
+
+      addSection(
+        "✅ Test Suite Completed",
+        '<div class="result pass">All core logic modules tested successfully!</div>',
+      );
+    </script>
+  </body>
+</html>

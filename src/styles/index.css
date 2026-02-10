@@ -1,0 +1,86 @@
+/* Import Google Fonts - Inter and DM Sans */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=DM+Sans:wght@400;500;700&display=swap");
+
+/* Tailwind CSS directives */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Base styles */
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  body {
+    @apply font-sans antialiased;
+    @apply bg-cloud text-slate;
+  }
+
+  /* Custom CSS variables for consistent spacing */
+  :root {
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+    --spacing-2xl: 48px;
+
+    /* Transition timing */
+    --transition-fast: 0.15s ease-out;
+    --transition-normal: 0.3s ease-out;
+    --transition-slow: 0.5s ease-out;
+  }
+}
+
+/* Custom component styles */
+@layer components {
+  /* Card component base */
+  .card {
+    @apply bg-white border border-stone rounded-xl;
+    /* Flat design - no shadows */
+  }
+
+  /* Input component base */
+  .input-base {
+    @apply bg-stone text-slate rounded-xl;
+    @apply focus:outline-none focus:ring-2 focus:ring-slate;
+    transition: all var(--transition-normal);
+  }
+
+  /* Smooth transitions for all interactive elements */
+  .transition-smooth {
+    transition: all var(--transition-normal);
+  }
+}
+
+/* Utility classes */
+@layer utilities {
+  /* Text styles from design system */
+  .text-logo {
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1.2;
+  }
+
+  .text-input {
+    font-size: 32px;
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  .text-label {
+    font-size: 12px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    line-height: 1.4;
+  }
+
+  .text-body {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.5;
+  }
+}
