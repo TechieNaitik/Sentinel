@@ -2,8 +2,6 @@
 
 Sentinel is a modern, privacy-focused password strength analyzer that goes beyond simple length checks. It uses information theory (Shannon Entropy), pattern detection, and cracking simulation to provide a comprehensive security assessment of your passwords.
 
-![Sentinel Preview](./preview.png)
-
 ## 🛡️ Features
 
 - **Advanced Entropy Calculation:** Calculates the true information density in bits based on character pool analysis.
